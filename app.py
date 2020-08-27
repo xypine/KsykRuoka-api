@@ -11,6 +11,7 @@ import hashlib
 import time
 
 app = Flask(__name__)
+cors = CORS(app)
 
 c = 0
 
