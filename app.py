@@ -24,7 +24,7 @@ ksyk_url = "https://ksyk.fi"
 
 def getMenu():
     page = urlopen(ksyk_url).read()
-    soup = BeautifulSoup(page,features="lxml")
+    soup = BeautifulSoup(page)
     matches = soup.find_all("div", class_="et_pb_tab_content")[0]
     children = matches.findChildren("p" , recursive=False)
 #    print(children)
