@@ -29,10 +29,14 @@ ksyk_url = "https://ksyk.fi"
 def getMenu():
     page = urlopen(ksyk_url).read()
     soup = BeautifulSoup(page)
-    matches = soup.find_all("div", class_="et_pb_tab_content")[0]
-    children = matches.findChildren("p" , recursive=False)
+    matches = soup.find_all("div", class_="et_pb_tab_content")
+    out = []
+    for x in matches:
+        children = x.findChildren("p" , recursive=False)
+        for i in children:
+            out.append( str(i.get_text(" \n ")) )
 #    print(children)
-    return str(children[0].get_text(" \n "))
+    return out#str(children[0].get_text(" \n "))
 def updateData():
     global last_updated, ruokalista
     now = time.time()
