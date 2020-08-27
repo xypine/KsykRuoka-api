@@ -9,6 +9,9 @@ from urllib.request import urlopen
 #Import other stuff
 import hashlib
 import time
+#CORS
+from flask_cors import CORS
+
 
 app = Flask(__name__)
 cors = CORS(app)
