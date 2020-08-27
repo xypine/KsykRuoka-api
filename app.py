@@ -22,7 +22,7 @@ version = 1
 
 ruokalista = ""
 last_updated = 1598534304.6135302
-update_threshold = 3600/3
+update_threshold = 3600
 
 ksyk_url = "https://ksyk.fi"
 
