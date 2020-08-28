@@ -60,7 +60,7 @@ def hello():
     global c
     c = c + 1
     idle = updateData()
-    return jsonify({'menu':ruokalista, 'recent_query_count':c, 'idle_time_before_this' : idle, 'last_updated' : last_updated, 'source-site':ksyk_url}), 200
+    return jsonify({'menu':ruokalista, 'recent_query_count':c, 'idle_time_before_this' : idle, 'last_updated' : last_updated, 'source_site':ksyk_url, 'update_threshold':update_threshold}), 200
 if __name__ == '__main__':
     # Bind to PORT if defined, otherwise default to 5000.
     updateData()
