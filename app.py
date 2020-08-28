@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import os
 #Import server stuff
 from flask import Flask, redirect
@@ -59,7 +60,7 @@ def hello():
     global c
     c = c + 1
     idle = updateData()
-    return jsonify({'menu':ruokalista, 'recent_query_count':c, 'idle_time_before_this' : idle, 'last_updated' : last_updated}), 200
+    return jsonify({'menu':ruokalista, 'recent_query_count':c, 'idle_time_before_this' : idle, 'last_updated' : last_updated, 'source-site':ksyk_url}), 200
 if __name__ == '__main__':
     # Bind to PORT if defined, otherwise default to 5000.
     updateData()
