@@ -105,14 +105,14 @@ def getUID(ip):
 
 @app.route('/')
 def hello():
-    global chat, version, use_sheets
+    global chat, version, use_sheets, shee
     uIp = request.access_route[0]
     uID = getUID(uIp)
     global c
     c = c + 1
     idle = updateData()
     u_s = check_sheets_update()
-    return jsonify({'menu':ruokalista, 'recent_query_count':c, 'time_since_last_update' : idle, 'last_updated' : last_updated, 'source_site':ksyk_url, 'update_threshold':update_threshold, 'sheets_enabled':u_s}), 200
+    return jsonify({'menu':ruokalista, 'recent_query_count':c, 'time_since_last_update' : idle, 'last_updated' : last_updated, 'source_site':ksyk_url, 'update_threshold':update_threshold, 'sheets_enabled':u_s, 'docs_name': str(shee)}), 200
 if __name__ == '__main__':
     updateData()
     updateSheets()
