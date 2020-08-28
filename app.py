@@ -64,18 +64,39 @@ def updateData():
         last_updated = now
         print("Menu updated.")
     return diff
+
+#Split
+sheet_split_num_start = 42
+sheet_split_num_end = 48
+#Normal
+sheet_norm_num_start = 55
+sheet_norm_num_end = 62
+#Universal
+sheet_alp_start = ord("b") - 96 #b
+sheet_alp_end = ord("j") - 96 #j
+#Holders
+normalL = []
+splitL = []
+sheet_day_step = 2
+#Set the sheet tab
+sheets_tab = 3
 def getSheets(s_id, s_key):
-    global sheets_url
+    global sheets_url, sheets_tab
     try:
         sheets_url = os.environ['sheets_url']
     except Exception as e:
-        print("\"sheets_url\" not set as an environ, the default url \"" + sheets_url + "\" will be used.")
+        print("\"sheets_url\" not set as an environ, the default url \"" + str(sheets_url) + "\" will be used.")
+    try:
+        sheets_tab = os.environ['sheets_tab']
+    except Exception as e:
+        print("\"sheets_tab\" not set as an environ, the default tab \"" + str(sheets_tab) + "\" will be used.")
     sheets = Sheets.from_developer_key(s_key)
     s = sheets.get(sheets_url)
     print("Sheet loaded: " + str(s))
+    print("monday sample: " + s.sheets[sheets_tab]['B' + str(sheet_split_num_start)])
     return s
 def updateSheets():
-    global use_sheets, shee
+    global use_sheets, shee, normalL, splitL, sheet_day_step
     print("Updating sheets data...")
     s_key = "";
     s_id = "";
@@ -93,10 +114,44 @@ def updateSheets():
     if use_sheets:
         try:
             shee = getSheets(s_id, s_key)
+            for day in range(sheet_alp_start, sheet_alp_end+1,sheet_day_step):
+                letter = chr(day+96).upper() + ""
+                print(letter)
+                print("Split lunches: ")
+                splitToday = []
+                normalToday = []
+                for sL in range(sheet_split_num_start, sheet_split_num_end+1):
+                    print("\t" + letter + str(sL) + " : ", end="")
+                    val = ""
+                    try:
+                        val = shee.sheets[sheets_tab][letter + str(sL)]
+                    except Exception as e:
+                        print("",end="")
+                    if val != "" and val != " ":
+                        print(val)
+                        splitToday.append(val.replace("/", " / "))
+                    else:
+                        print()
+                print("Normal lunches: ")
+                for nL in range(sheet_norm_num_start, sheet_norm_num_end+1):
+                    print("\t" + letter + str(nL) + " : ", end="")
+                    val = ""
+                    try:
+                        val = shee.sheets[sheets_tab][letter + str(nL)]
+                    except Exception as e:
+                        print("",end="")
+                    if val != "" and val != " ":
+                        print(val)
+                        normalToday.append(val.replace("/", " / "))
+                    else:
+                        print()
+                splitL.append(splitToday)
+                normalL.append(normalToday)
             u_s = True
         except Exception as e:
             print("Sheets could not be loaded, please confirm that the url is correct and you have the rights to use it. \nError: "+ str(e))
             u_s = False
+#            raise(e)
     print("Updated sheets data.")
     return u_s
 last_u_s = False
@@ -120,7 +175,7 @@ def hello():
     c = c + 1
     idle = updateData()
     u_s = check_sheets_update()
-    return jsonify({'menu':ruokalista, 'recent_query_count':c, 'menu_time_since_last_update' : idle, 'menu_last_updated' : last_updated, 'menu_source_site':ksyk_url, 'menu_update_threshold':update_threshold, 'sheets_enabled':u_s, 'sheet_docs_name': str(shee), 'sheets_last_updated':sheets_last_updated, 'sheets_update_threshold':sheets_update_threshold, 'sheets_time_since_last_update':(sheets_last_updated - now())*-1}), 200
+    return jsonify({'menu':ruokalista, 'recent_query_count':c, 'menu_time_since_last_update' : idle, 'menu_last_updated' : last_updated, 'menu_source_site':ksyk_url, 'menu_update_threshold':update_threshold, 'sheets_enabled':u_s, 'sheet_docs_name': str(shee), 'sheets_last_updated':sheets_last_updated, 'sheets_update_threshold':sheets_update_threshold, 'sheets_time_since_last_update':(sheets_last_updated - now())*-1, 'sheets_splitLunch':splitL, 'sheets_normalLunch':normalL}), 200
 if __name__ == '__main__':
     updateData()
     updateSheets()
