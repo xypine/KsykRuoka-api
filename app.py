@@ -20,7 +20,7 @@ cors = CORS(app)
 use_sheets = True
 try:
     if use_sheets:
-        import gsheets
+        from gsheets import Sheets
 except Exception as e:
     print("FAILED importing gsheets, loading stuff automatically from the will be disabled.")
     use_sheets = False
@@ -32,6 +32,10 @@ version = 1
 ruokalista = ""
 last_updated = 1598534304.6135302
 update_threshold = 3600
+
+shee = {}
+sheets_last_updated = 1598534304.6135302
+sheets_update_threshold = 3600
 
 ksyk_url = "https://ksyk.fi"
 sheets_url = "https://docs.google.com/spreadsheets/d/13i4VIuaIis1FS8qozXoZUj6bjBgXKdcO9DLdDFN4Sk8/edit#gid=1733754615"
@@ -58,26 +62,60 @@ def updateData():
         last_updated = now
         print("Menu updated.")
     return diff
-def getUID(ip):
-    return hashlib.sha256(str(ip).encode("utf8")).hexdigest()
-
-@app.route('/')
-def hello():
-    global chat, version
-    uIp = request.access_route[0]
-    uID = getUID(uIp)
-    global c
-    c = c + 1
-    idle = updateData()
+def getSheets(s_id, s_key):
+    sheets = Sheets.from_developer_key(s_key)
+    s = sheets.get(sheets_url)
+    print("Sheet loaded: " + str(s))
+    return s
+def updateSheets():
+    global use_sheets
+    print("Updating sheets data...")
     s_key = "";
+    s_id = "";
     try:
         s_key = os.environ['secret_key']
     except Exception as e:
         print("\"secret_key\" not set as an environ, google sheets will be unavaible.")
         use_sheets = False
-    return jsonify({'menu':ruokalista, 'recent_query_count':c, 'time_since_last_update' : idle, 'last_updated' : last_updated, 'source_site':ksyk_url, 'update_threshold':update_threshold}), 200
+    try:
+        s_id = os.environ['secret_id']
+    except Exception as e:
+        print("\"secret_id\" not set as an environ, google sheets will be unavaible.")
+        use_sheets = False
+    u_s = use_sheets
+    if use_sheets:
+        try:
+            getSheets(s_id, s_key)
+            u_s = true
+        except Exception as e:
+            print("Sheets could not be loaded, please confirm that the url is correct and you have the rights to use it. \nError: "+ str(e))
+            u_s = False
+    print("Updated sheets data.")
+    return u_s
+last_u_s = False
+def check_sheets_update():
+    global sheets_last_updated, last_u_s
+    now = time.time()
+    diff = -(last_updated - now)
+    if diff > sheets_update_threshold:
+        last_u_s = updateSheets()
+    return last_u_s
+def getUID(ip):
+    return hashlib.sha256(str(ip).encode("utf8")).hexdigest()
+
+@app.route('/')
+def hello():
+    global chat, version, use_sheets
+    uIp = request.access_route[0]
+    uID = getUID(uIp)
+    global c
+    c = c + 1
+    idle = updateData()
+    u_s = check_sheets_update()
+    return jsonify({'menu':ruokalista, 'recent_query_count':c, 'time_since_last_update' : idle, 'last_updated' : last_updated, 'source_site':ksyk_url, 'update_threshold':update_threshold, 'sheets_enabled':u_s}), 200
 if __name__ == '__main__':
-    # Bind to PORT if defined, otherwise default to 5000.
     updateData()
+    updateSheets()
+    # Bind to PORT if defined, otherwise default to 5000.
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
