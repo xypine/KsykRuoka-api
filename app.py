@@ -17,6 +17,14 @@ from flask_cors import CORS
 app = Flask(__name__)
 cors = CORS(app)
 
+use_sheets = True
+try:
+    if use_sheets:
+        import gsheets
+except Exception as e:
+    print("FAILED importing gsheets, loading stuff automatically from the will be disabled.")
+    use_sheets = False
+
 c = 0
 
 version = 1
@@ -26,6 +34,7 @@ last_updated = 1598534304.6135302
 update_threshold = 3600
 
 ksyk_url = "https://ksyk.fi"
+sheets_url = "https://docs.google.com/spreadsheets/d/13i4VIuaIis1FS8qozXoZUj6bjBgXKdcO9DLdDFN4Sk8/edit#gid=1733754615"
 
 def getMenu():
     page = urlopen(ksyk_url).read()
@@ -65,7 +74,8 @@ def hello():
         s_key = os.environ['secret_key']
     except Exception as e:
         print("\"secret_key\" not set as an environ, google sheets will be unavaible.")
-    return jsonify({'menu':ruokalista, 'recent_query_count':c, 'time_since_last_update' : idle, 'last_updated' : last_updated, 'source_site':ksyk_url, 'update_threshold':update_threshold, 'secret_key_test': s_key}), 200
+        use_sheets = False
+    return jsonify({'menu':ruokalista, 'recent_query_count':c, 'time_since_last_update' : idle, 'last_updated' : last_updated, 'source_site':ksyk_url, 'update_threshold':update_threshold}), 200
 if __name__ == '__main__':
     # Bind to PORT if defined, otherwise default to 5000.
     updateData()

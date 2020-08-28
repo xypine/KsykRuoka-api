@@ -1,3 +1,4 @@
 Flask==1.0
 beautifulsoup4==4.9.1
 flask-cors
+gsheets==0.5
