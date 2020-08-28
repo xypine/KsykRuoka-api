@@ -39,6 +39,7 @@ sheets_update_threshold = 3600
 
 ksyk_url = "https://ksyk.fi"
 sheets_url = "https://docs.google.com/spreadsheets/d/1dxvJz33F-LT71VYN5d97AhJ5FbpU9Sqlhf_TwS4k-bM"
+repo_url = "https://github.com/jonnelafin/KsykRuoka-api"
 
 def getMenu():
     page = urlopen(ksyk_url).read()
@@ -152,7 +153,7 @@ def updateSheets():
             print("Sheets could not be loaded, please confirm that the url is correct and you have the rights to use it. \nError: "+ str(e))
             u_s = False
 #            raise(e)
-    print("Updated sheets data.")
+    print("Sheets data updated.")
     return u_s
 last_u_s = False
 def check_sheets_update():
@@ -175,7 +176,7 @@ def hello():
     c = c + 1
     idle = updateData()
     u_s = check_sheets_update()
-    return jsonify({'menu':ruokalista, 'recent_query_count':c, 'menu_time_since_last_update' : idle, 'menu_last_updated' : last_updated, 'menu_source_site':ksyk_url, 'menu_update_threshold':update_threshold, 'sheets_enabled':u_s, 'sheet_docs_name': str(shee), 'sheets_last_updated':sheets_last_updated, 'sheets_update_threshold':sheets_update_threshold, 'sheets_time_since_last_update':(sheets_last_updated - now())*-1, 'sheets_splitLunch':splitL, 'sheets_normalLunch':normalL, 'app_version':version}), 200
+    return jsonify({'menu':ruokalista, 'recent_query_count':c, 'menu_time_since_last_update' : idle, 'menu_last_updated' : last_updated, 'menu_source_site':ksyk_url, 'menu_update_threshold':update_threshold, 'sheets_enabled':u_s, 'sheet_docs_name': str(shee), 'sheets_last_updated':sheets_last_updated, 'sheets_update_threshold':sheets_update_threshold, 'sheets_time_since_last_update':(sheets_last_updated - now())*-1, 'sheets_splitLunch':splitL, 'sheets_normalLunch':normalL, 'app_version':version, 'app_source':repo_url}), 200
 if __name__ == '__main__':
     updateData()
     updateSheets()
