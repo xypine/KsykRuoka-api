@@ -38,7 +38,7 @@ sheets_last_updated = 1598534304.6135302
 sheets_update_threshold = 3600
 
 ksyk_url = "https://ksyk.fi"
-sheets_url = "https://docs.google.com/spreadsheets/d/13i4VIuaIis1FS8qozXoZUj6bjBgXKdcO9DLdDFN4Sk8/edit#gid=1733754615"
+sheets_url = "https://docs.google.com/spreadsheets/d/1dxvJz33F-LT71VYN5d97AhJ5FbpU9Sqlhf_TwS4k-bM"
 
 def getMenu():
     page = urlopen(ksyk_url).read()
@@ -68,7 +68,7 @@ def getSheets(s_id, s_key):
     print("Sheet loaded: " + str(s))
     return s
 def updateSheets():
-    global use_sheets
+    global use_sheets, shee
     print("Updating sheets data...")
     s_key = "";
     s_id = "";
@@ -85,8 +85,8 @@ def updateSheets():
     u_s = use_sheets
     if use_sheets:
         try:
-            getSheets(s_id, s_key)
-            u_s = true
+            shee = getSheets(s_id, s_key)
+            u_s = True
         except Exception as e:
             print("Sheets could not be loaded, please confirm that the url is correct and you have the rights to use it. \nError: "+ str(e))
             u_s = False
