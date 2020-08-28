@@ -27,7 +27,7 @@ except Exception as e:
 
 c = 0
 
-version = 1
+version = 3
 
 ruokalista = ""
 last_updated = 1598534304.6135302
@@ -175,7 +175,7 @@ def hello():
     c = c + 1
     idle = updateData()
     u_s = check_sheets_update()
-    return jsonify({'menu':ruokalista, 'recent_query_count':c, 'menu_time_since_last_update' : idle, 'menu_last_updated' : last_updated, 'menu_source_site':ksyk_url, 'menu_update_threshold':update_threshold, 'sheets_enabled':u_s, 'sheet_docs_name': str(shee), 'sheets_last_updated':sheets_last_updated, 'sheets_update_threshold':sheets_update_threshold, 'sheets_time_since_last_update':(sheets_last_updated - now())*-1, 'sheets_splitLunch':splitL, 'sheets_normalLunch':normalL}), 200
+    return jsonify({'menu':ruokalista, 'recent_query_count':c, 'menu_time_since_last_update' : idle, 'menu_last_updated' : last_updated, 'menu_source_site':ksyk_url, 'menu_update_threshold':update_threshold, 'sheets_enabled':u_s, 'sheet_docs_name': str(shee), 'sheets_last_updated':sheets_last_updated, 'sheets_update_threshold':sheets_update_threshold, 'sheets_time_since_last_update':(sheets_last_updated - now())*-1, 'sheets_splitLunch':splitL, 'sheets_normalLunch':normalL, 'app_version':version}), 200
 if __name__ == '__main__':
     updateData()
     updateSheets()
