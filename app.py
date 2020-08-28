@@ -51,6 +51,8 @@ def getMenu():
             out.append( str(i.get_text(" \n ")) )
 #    print(children)
     return out#str(children[0].get_text(" \n "))
+def now():
+    return time.time()
 def updateData():
     global last_updated, ruokalista
     now = time.time()
@@ -63,6 +65,11 @@ def updateData():
         print("Menu updated.")
     return diff
 def getSheets(s_id, s_key):
+    global sheets_url
+    try:
+        sheets_url = os.environ['sheets_url']
+    except Exception as e:
+        print("\"sheets_url\" not set as an environ, the default url \"" + sheets_url + "\" will be used.")
     sheets = Sheets.from_developer_key(s_key)
     s = sheets.get(sheets_url)
     print("Sheet loaded: " + str(s))
@@ -96,9 +103,10 @@ last_u_s = False
 def check_sheets_update():
     global sheets_last_updated, last_u_s
     now = time.time()
-    diff = -(last_updated - now)
+    diff = -(sheets_last_updated - now)
     if diff > sheets_update_threshold:
         last_u_s = updateSheets()
+        sheets_last_updated = now
     return last_u_s
 def getUID(ip):
     return hashlib.sha256(str(ip).encode("utf8")).hexdigest()
@@ -112,7 +120,7 @@ def hello():
     c = c + 1
     idle = updateData()
     u_s = check_sheets_update()
-    return jsonify({'menu':ruokalista, 'recent_query_count':c, 'time_since_last_update' : idle, 'last_updated' : last_updated, 'source_site':ksyk_url, 'update_threshold':update_threshold, 'sheets_enabled':u_s, 'docs_name': str(shee)}), 200
+    return jsonify({'menu':ruokalista, 'recent_query_count':c, 'menu_time_since_last_update' : idle, 'menu_last_updated' : last_updated, 'menu_source_site':ksyk_url, 'menu_update_threshold':update_threshold, 'sheets_enabled':u_s, 'sheet_docs_name': str(shee), 'sheets_last_updated':sheets_last_updated, 'sheets_update_threshold':sheets_update_threshold, 'sheets_time_since_last_update':(sheets_last_updated - now())*-1}), 200
 if __name__ == '__main__':
     updateData()
     updateSheets()
