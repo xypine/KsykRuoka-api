@@ -69,6 +69,9 @@ def updateData():
 #Split
 sheet_split_num_start = 42
 sheet_split_num_end = 48
+
+sheet_low_split_num_start = 29
+sheet_low_split_num_end = 34
 #Normal
 sheet_norm_num_start = 55
 sheet_norm_num_end = 62
@@ -78,6 +81,7 @@ sheet_alp_end = ord("j") - 96 #j
 #Holders
 normalL = []
 splitL = []
+splitL_low = []
 sheet_day_step = 2
 #Set the sheet tab
 sheets_tab = 3
@@ -97,7 +101,10 @@ def getSheets(s_id, s_key):
     print("monday sample: " + s.sheets[sheets_tab]['B' + str(sheet_split_num_start)])
     return s
 def updateSheets():
-    global use_sheets, shee, normalL, splitL, sheet_day_step
+    global use_sheets, shee, normalL, splitL, sheet_day_step, splitL_low
+    normalL = []
+    splitL = []
+    splitL_low = []
     print("Updating sheets data...")
     s_key = "";
     s_id = "";
@@ -148,6 +155,21 @@ def updateSheets():
                         print()
                 splitL.append(splitToday)
                 normalL.append(normalToday)
+                print("Lower Split lunches: ")
+                splitToday_low = []
+                for sL in range(sheet_low_split_num_start, sheet_low_split_num_end+1):
+                    print("\t" + letter + str(sL) + " : ", end="")
+                    val = ""
+                    try:
+                        val = shee.sheets[sheets_tab][letter + str(sL)]
+                    except Exception as e:
+                        print("",end="")
+                    if val != "" and val != " ":
+                        print(val)
+                        splitToday_low.append(val.replace("/", " / "))
+                    else:
+                        print()
+                splitL_low.append(splitToday_low)
             u_s = True
         except Exception as e:
             print("Sheets could not be loaded, please confirm that the url is correct and you have the rights to use it. \nError: "+ str(e))
@@ -176,7 +198,7 @@ def hello():
     c = c + 1
     idle = updateData()
     u_s = check_sheets_update()
-    return jsonify({'menu':ruokalista, 'recent_query_count':c, 'menu_time_since_last_update' : idle, 'menu_last_updated' : last_updated, 'menu_source_site':ksyk_url, 'menu_update_threshold':update_threshold, 'sheets_enabled':u_s, 'sheet_docs_name': str(shee), 'sheets_last_updated':sheets_last_updated, 'sheets_update_threshold':sheets_update_threshold, 'sheets_time_since_last_update':(sheets_last_updated - now())*-1, 'sheets_splitLunch':splitL, 'sheets_normalLunch':normalL, 'app_version':version, 'app_source':repo_url}), 200
+    return jsonify({'menu':ruokalista, 'recent_query_count':c, 'menu_time_since_last_update' : idle, 'menu_last_updated' : last_updated, 'menu_source_site':ksyk_url, 'menu_update_threshold':update_threshold, 'sheets_enabled':u_s, 'sheet_docs_name': str(shee), 'sheets_last_updated':sheets_last_updated, 'sheets_update_threshold':sheets_update_threshold, 'sheets_time_since_last_update':(sheets_last_updated - now())*-1, 'sheets_splitLunch':splitL, 'sheets_normalLunch':normalL, 'app_version':version, 'app_source':repo_url, 'sheets_lower_splitLunch':splitL_low}), 200
 if __name__ == '__main__':
     updateData()
     updateSheets()
