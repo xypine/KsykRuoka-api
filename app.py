@@ -10,6 +10,7 @@ from urllib.request import urlopen
 #Import other stuff
 import hashlib
 import time
+import json
 #CORS
 from flask_cors import CORS
 
@@ -18,13 +19,6 @@ app = Flask(__name__)
 cors = CORS(app)
 
 use_sheets = True
-try:
-    if use_sheets:
-        from gsheets import Sheets
-except Exception as e:
-    print("FAILED importing gsheets, loading stuff automatically from the will be disabled.")
-    use_sheets = False
-
 c = 0
 
 version = 3
@@ -34,11 +28,11 @@ last_updated = 1598534304.6135302
 update_threshold = 3600
 
 shee = {}
-sheets_last_updated = 1598534304.6135302
-sheets_update_threshold = 3600
+splits_last_updated = 1598534304.6135302
+splits_update_threshold = 3600
 
 ksyk_url = "https://ksyk.fi"
-sheets_url = "https://docs.google.com/spreadsheets/d/1dxvJz33F-LT71VYN5d97AhJ5FbpU9Sqlhf_TwS4k-bM"
+splits_url = "https://koulusfi.herokuapp.com/api/splits"
 repo_url = "https://github.com/jonnelafin/KsykRuoka-api"
 
 def getMenu():
@@ -66,125 +60,72 @@ def updateData():
         print("Menu updated.")
     return diff
 
-#Split
-sheet_split_num_start = 42
-sheet_split_num_end = 48
-
-sheet_low_split_num_start = 29
-sheet_low_split_num_end = 34
-#Normal
-sheet_norm_num_start = 55
-sheet_norm_num_end = 62
-#Universal
-sheet_alp_start = ord("b") - 96 #b
-sheet_alp_end = ord("j") - 96 #j
 #Holders
 normalL = []
 splitL = []
 splitL_low = []
-sheet_day_step = 2
-#Set the sheet tab
-sheets_tab = 3
-def getSheets(s_id, s_key):
-    global sheets_url, sheets_tab
+
+def getSplits():
+    global splits_url
     try:
-        sheets_url = os.environ['sheets_url']
+        splits_url = os.environ['splits_url']
     except Exception as e:
-        print("\"sheets_url\" not set as an environ, the default url \"" + str(sheets_url) + "\" will be used.")
-    try:
-        sheets_tab = os.environ['sheets_tab']
-    except Exception as e:
-        print("\"sheets_tab\" not set as an environ, the default tab \"" + str(sheets_tab) + "\" will be used.")
-    sheets = Sheets.from_developer_key(s_key)
-    s = sheets.get(sheets_url)
-    print("Sheet loaded: " + str(s))
-    print("monday sample: " + s.sheets[sheets_tab]['B' + str(sheet_split_num_start)])
-    return s
+        print("\"splits_url\" not set as an environ, the default url \"" + str(splits_url) + "\" will be used.")
+    page_json = urlopen(splits_url).read()
+    s = json.loads(page_json)
+    print("Splits loaded: " + str(s))
+    print("monday sample: " + s["data"]["MA"]["12.05-12.30"][0])
+    return s["data"]
 def updateSheets():
     global use_sheets, shee, normalL, splitL, sheet_day_step, splitL_low
     normalL = []
     splitL = []
     splitL_low = []
-    print("Updating sheets data...")
-    s_key = "";
-    s_id = "";
-    try:
-        s_key = os.environ['secret_key']
-    except Exception as e:
-        print("\"secret_key\" not set as an environ, google sheets will be unavaible.")
-        use_sheets = False
-    try:
-        s_id = os.environ['secret_id']
-    except Exception as e:
-        print("\"secret_id\" not set as an environ, google sheets will be unavaible.")
-        use_sheets = False
-    u_s = use_sheets
+    print("Updating split data...")
+    u_s = False
     if use_sheets:
         try:
-            shee = getSheets(s_id, s_key)
-            for day in range(sheet_alp_start, sheet_alp_end+1,sheet_day_step):
-                letter = chr(day+96).upper() + ""
-                print(letter)
+            shee = getSplits()
+            for day in shee:
                 print("Split lunches: ")
                 splitToday = []
                 normalToday = []
-                for sL in range(sheet_split_num_start, sheet_split_num_end+1):
-                    print("\t" + letter + str(sL) + " : ", end="")
-                    val = ""
-                    try:
-                        val = shee.sheets[sheets_tab][letter + str(sL)]
-                    except Exception as e:
-                        print("",end="")
-                    if val != "" and val != " ":
-                        print(val)
-                        splitToday.append(val.replace("/", " / "))
-                    else:
-                        print()
+                for val in shee[day]["12.05-12.30"]:
+                    if not "xL" in val:
+                        continue
+                    print(val)
+                    splitToday.append(val.replace("/", " / "))
                 print("Normal lunches: ")
-                for nL in range(sheet_norm_num_start, sheet_norm_num_end+1):
-                    print("\t" + letter + str(nL) + " : ", end="")
-                    val = ""
-                    try:
-                        val = shee.sheets[sheets_tab][letter + str(nL)]
-                    except Exception as e:
-                        print("",end="")
-                    if val != "" and val != " ":
-                        print(val)
-                        normalToday.append(val.replace("/", " / "))
-                    else:
-                        print()
+                for val in shee[day]["12.30-12.55"]:
+                    if not "xL" in val:
+                        continue
+                    print(val)
+                    normalToday.append(val.replace("/", " / "))
                 splitL.append(splitToday)
                 normalL.append(normalToday)
                 print("Lower Split lunches: ")
                 splitToday_low = []
-                for sL in range(sheet_low_split_num_start, sheet_low_split_num_end+1):
-                    print("\t" + letter + str(sL) + " : ", end="")
-                    val = ""
-                    try:
-                        val = shee.sheets[sheets_tab][letter + str(sL)]
-                    except Exception as e:
-                        print("",end="")
-                    if val != "" and val != " ":
-                        print(val)
-                        splitToday_low.append(val.replace("/", " / "))
-                    else:
-                        print()
+                for val in shee[day]["11.40-12.05"]:
+                    if not "xL" in val:
+                        continue
+                    print(val)
+                    splitToday_low.append(val.replace("/", " / "))
                 splitL_low.append(splitToday_low)
             u_s = True
         except Exception as e:
-            print("Sheets could not be loaded, please confirm that the url is correct and you have the rights to use it. \nError: "+ str(e))
+            print("Splits could not be loaded, please confirm that the url is correct and you have the rights to use it. \nError: "+ str(e))
             u_s = False
 #            raise(e)
-    print("Sheets data updated.")
+    print("Split data updated.")
     return u_s
 last_u_s = False
 def check_sheets_update():
-    global sheets_last_updated, last_u_s
+    global splits_last_updated, last_u_s
     now = time.time()
-    diff = -(sheets_last_updated - now)
-    if diff > sheets_update_threshold:
+    diff = -(splits_last_updated - now)
+    if diff > splits_update_threshold:
         last_u_s = updateSheets()
-        sheets_last_updated = now
+        splits_last_updated = now
     return last_u_s
 def getUID(ip):
     return hashlib.sha256(str(ip).encode("utf8")).hexdigest()
@@ -198,7 +139,7 @@ def hello():
     c = c + 1
     idle = updateData()
     u_s = check_sheets_update()
-    return jsonify({'menu':ruokalista, 'recent_query_count':c, 'menu_time_since_last_update' : idle, 'menu_last_updated' : last_updated, 'menu_source_site':ksyk_url, 'menu_update_threshold':update_threshold, 'sheets_enabled':u_s, 'sheet_docs_name': str(shee), 'sheets_last_updated':sheets_last_updated, 'sheets_update_threshold':sheets_update_threshold, 'sheets_time_since_last_update':(sheets_last_updated - now())*-1, 'sheets_splitLunch':splitL, 'sheets_normalLunch':normalL, 'app_version':version, 'app_source':repo_url, 'sheets_lower_splitLunch':splitL_low}), 200
+    return jsonify({'menu':ruokalista, 'recent_query_count':c, 'menu_time_since_last_update' : idle, 'menu_last_updated' : last_updated, 'menu_source_site':ksyk_url, 'menu_update_threshold':update_threshold, 'sheets_enabled':u_s, 'splits_last_updated': splits_last_updated, 'splits_update_threshold':splits_update_threshold, 'splits_time_since_last_update':(splits_last_updated - now())*-1, 'sheets_splitLunch':splitL, 'sheets_normalLunch':normalL, 'app_version':version, 'app_source':repo_url, 'sheets_lower_splitLunch':splitL_low}), 200
 if __name__ == '__main__':
     updateData()
     updateSheets()
