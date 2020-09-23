@@ -92,7 +92,7 @@ def getSheets(s_id, s_key):
     except Exception as e:
         print("\"sheets_url\" not set as an environ, the default url \"" + str(sheets_url) + "\" will be used.")
     try:
-        sheets_tab = os.environ['sheets_tab']
+        sheets_tab = int(os.environ['sheets_tab'])
     except Exception as e:
         print("\"sheets_tab\" not set as an environ, the default tab \"" + str(sheets_tab) + "\" will be used.")
     sheets = Sheets.from_developer_key(s_key)
