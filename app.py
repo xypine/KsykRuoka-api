@@ -84,7 +84,7 @@ splitL = []
 splitL_low = []
 sheet_day_step = 2
 #Set the sheet tab
-sheets_tab = 3
+sheets_tab = 2
 def getSheets(s_id, s_key):
     global sheets_url, sheets_tab
     try:
