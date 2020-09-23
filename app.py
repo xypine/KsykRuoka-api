@@ -34,6 +34,7 @@ last_updated = 1598534304.6135302
 update_threshold = 3600
 
 shee = {}
+sheets_tab_name = ""
 sheets_last_updated = 1598534304.6135302
 sheets_update_threshold = 3600
 
@@ -86,7 +87,7 @@ sheet_day_step = 2
 #Set the sheet tab
 sheets_tab = 2
 def getSheets(s_id, s_key):
-    global sheets_url, sheets_tab
+    global sheets_url, sheets_tab, sheets_tab_name
     try:
         sheets_url = os.environ['sheets_url']
     except Exception as e:
@@ -99,6 +100,7 @@ def getSheets(s_id, s_key):
     s = sheets.get(sheets_url)
     print("Sheet loaded: " + str(s))
     print("monday sample: " + s.sheets[sheets_tab]['B' + str(sheet_split_num_start)])
+    sheets_tab_name = str(s.sheets[sheets_tab])
     return s
 def updateSheets():
     global use_sheets, shee, normalL, splitL, sheet_day_step, splitL_low
@@ -198,7 +200,7 @@ def hello():
     c = c + 1
     idle = updateData()
     u_s = check_sheets_update()
-    return jsonify({'menu':ruokalista, 'recent_query_count':c, 'menu_time_since_last_update' : idle, 'menu_last_updated' : last_updated, 'menu_source_site':ksyk_url, 'menu_update_threshold':update_threshold, 'sheets_enabled':u_s, 'sheet_docs_name': str(shee), 'sheets_last_updated':sheets_last_updated, 'sheets_update_threshold':sheets_update_threshold, 'sheets_time_since_last_update':(sheets_last_updated - now())*-1, 'sheets_splitLunch':splitL, 'sheets_normalLunch':normalL, 'app_version':version, 'app_source':repo_url, 'sheets_lower_splitLunch':splitL_low}), 200
+    return jsonify({'menu':ruokalista, 'recent_query_count':c, 'menu_time_since_last_update' : idle, 'menu_last_updated' : last_updated, 'menu_source_site':ksyk_url, 'menu_update_threshold':update_threshold, 'sheets_enabled':u_s, 'sheet_docs_name': str(shee), 'sheets_last_updated':sheets_last_updated, 'sheets_update_threshold':sheets_update_threshold, 'sheets_time_since_last_update':(sheets_last_updated - now())*-1, 'sheets_splitLunch':splitL, 'sheets_normalLunch':normalL, 'app_version':version, 'app_source':repo_url, 'sheets_lower_splitLunch':splitL_low, 'sheets_tab_name':sheets_tab_name}), 200
 if __name__ == '__main__':
     updateData()
     updateSheets()
