@@ -27,7 +27,7 @@ except Exception as e:
 
 c = 0
 
-version = 3
+version = 4
 
 ruokalista = ""
 last_updated = 1598534304.6135302
