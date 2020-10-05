@@ -2,7 +2,7 @@
 
 ## Explanation of keys & values
 
-While most of the json values have quite descritptive names, the following block tries to explain as many of the possible values as possible.
+While most of the json values have quite descriptive names, the following block tries to explain as many of the possible values as possible.
 
 > app_source:	String containing the link to the respective application repo
 
