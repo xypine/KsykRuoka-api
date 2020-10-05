@@ -3,7 +3,7 @@
 This folder contains  documentation for the eliittisafka-api version 5.
 Some documentation has not been completed* or even started yet*, make do.
 
-- Expected output of the api & How to use the api in your app
+- [Example output of the API & Explanation](Expected_Output.md) 
 
 - Setup
 	- Getting the code
