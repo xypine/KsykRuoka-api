@@ -210,7 +210,7 @@ def hello():
     return jsonify({'menu':ruokalista, 'recent_query_count':c, 'menu_time_since_last_update' : idle, 'menu_last_updated' : last_updated, 'menu_source_site':ksyk_url, 'menu_update_threshold':update_threshold, 'sheets_enabled':u_s, 'sheet_docs_name': str(shee), 'sheets_last_updated':sheets_last_updated, 'sheets_update_threshold':sheets_update_threshold, 'sheets_time_since_last_update':(sheets_last_updated - now())*-1, 'sheets_splitLunch':splitL, 'sheets_normalLunch':normalL, 'app_version':version, 'app_source':repo_url, 'sheets_lower_splitLunch':splitL_low, 'sheets_tab_name':sheets_tab_name}), 200
 @app.route('/stats')
 def stat():
-    return jsonify({'recent_query_count':c, 'recent_unique_query_count':len(clients)})
+    return jsonify({'recent_query_count':c, 'recent_query_count_unique':len(clients)})
 if __name__ == '__main__':
     print("Updating data...")
     updateData()
