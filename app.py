@@ -26,6 +26,7 @@ except Exception as e:
     use_sheets = False
 
 c = 0
+c_unique = 0
 
 version = 5
 
@@ -41,6 +42,10 @@ sheets_update_threshold = 3600
 ksyk_url = "https://ksyk.fi"
 sheets_url = "https://docs.google.com/spreadsheets/d/1dxvJz33F-LT71VYN5d97AhJ5FbpU9Sqlhf_TwS4k-bM"
 repo_url = "https://github.com/jonnelafin/KsykRuoka-api"
+
+clients = []
+def getUID(ip):
+    return hashlib.sha256(str(ip).encode("utf8")).hexdigest()
 
 def getMenu():
     page = urlopen(ksyk_url).read()
@@ -193,17 +198,26 @@ def getUID(ip):
 
 @app.route('/')
 def hello():
-    global chat, version, use_sheets, shee
+    global chat, version, use_sheets, shee, c, clients
     uIp = request.access_route[0]
     uID = getUID(uIp)
     global c
     c = c + 1
+    if not uID in clients:
+        clients.append(uID)
     idle = updateData()
     u_s = check_sheets_update()
     return jsonify({'menu':ruokalista, 'recent_query_count':c, 'menu_time_since_last_update' : idle, 'menu_last_updated' : last_updated, 'menu_source_site':ksyk_url, 'menu_update_threshold':update_threshold, 'sheets_enabled':u_s, 'sheet_docs_name': str(shee), 'sheets_last_updated':sheets_last_updated, 'sheets_update_threshold':sheets_update_threshold, 'sheets_time_since_last_update':(sheets_last_updated - now())*-1, 'sheets_splitLunch':splitL, 'sheets_normalLunch':normalL, 'app_version':version, 'app_source':repo_url, 'sheets_lower_splitLunch':splitL_low, 'sheets_tab_name':sheets_tab_name}), 200
+@app.route('/stats')
+def stat():
+    return jsonify({'recent_query_count':c, 'recent_unique_query_count':len(clients)})
 if __name__ == '__main__':
+    print("Updating data...")
     updateData()
     updateSheets()
+    print("Data updated.")
+    print("Serving api...")
     # Bind to PORT if defined, otherwise default to 5000.
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
+    print("API Exit")
