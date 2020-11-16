@@ -73,14 +73,14 @@ def updateData():
     return diff
 
 #Split
-sheet_split_num_start = 42
-sheet_split_num_end = 48
+sheet_split_num_start = 42+1
+sheet_split_num_end = 48+1
 
-sheet_low_split_num_start = 29
-sheet_low_split_num_end = 34
+sheet_low_split_num_start = 29+1
+sheet_low_split_num_end = 34+1
 #Normal
-sheet_norm_num_start = 55
-sheet_norm_num_end = 62
+sheet_norm_num_start = 55+1
+sheet_norm_num_end = 62+1
 #Universal
 sheet_alp_start = ord("b") - 96 #b
 sheet_alp_end = ord("j") - 96 #j
