@@ -23,6 +23,8 @@ try:
         from gsheets import Sheets
 except Exception as e:
     print("FAILED importing gsheets, loading stuff automatically from the will be disabled.")
+    print(f"Error: {e}")
+    raise(e)
     use_sheets = False
 
 c = 0
@@ -40,7 +42,7 @@ sheets_last_updated = 1598534304.6135302
 sheets_update_threshold = 3600
 
 ksyk_url = "https://ksyk.fi"
-sheets_url = "https://docs.google.com/spreadsheets/d/1dxvJz33F-LT71VYN5d97AhJ5FbpU9Sqlhf_TwS4k-bM"
+sheets_url = "https://docs.google.com/spreadsheets/d/1yfYLXnaO6CF2qNYoPpTlqrZymYdEwq8WPzL4VUnjBJc/edit?usp=sharing"
 repo_url = "https://github.com/jonnelafin/KsykRuoka-api"
 
 clients = []
@@ -73,14 +75,14 @@ def updateData():
     return diff
 
 #Split
-sheet_split_num_start = 42+1
-sheet_split_num_end = 48+1
+sheet_split_num_start = 12
+sheet_split_num_end = 21
 
-sheet_low_split_num_start = 29+1
-sheet_low_split_num_end = 34+1
+sheet_low_split_num_start = -1
+sheet_low_split_num_end = -1
 #Normal
-sheet_norm_num_start = 55+1
-sheet_norm_num_end = 62+1
+sheet_norm_num_start = 25
+sheet_norm_num_end = 34
 #Universal
 sheet_alp_start = ord("b") - 96 #b
 sheet_alp_end = ord("j") - 96 #j
@@ -90,7 +92,7 @@ splitL = []
 splitL_low = []
 sheet_day_step = 2
 #Set the sheet tab
-sheets_tab = 2
+sheets_tab = 3
 def getSheets(s_id, s_key):
     global sheets_url, sheets_tab, sheets_tab_name
     try:
@@ -104,6 +106,7 @@ def getSheets(s_id, s_key):
     sheets = Sheets.from_developer_key(s_key)
     s = sheets.get(sheets_url)
     print("Sheet loaded: " + str(s))
+    print(s.sheets[sheets_tab])
     print("monday sample: " + s.sheets[sheets_tab]['B' + str(sheet_split_num_start)])
     sheets_tab_name = str(s.sheets[sheets_tab])
     return s
@@ -162,26 +165,30 @@ def updateSheets():
                         print()
                 splitL.append(splitToday)
                 normalL.append(normalToday)
-                print("Lower Split lunches: ")
-                splitToday_low = []
-                for sL in range(sheet_low_split_num_start, sheet_low_split_num_end+1):
-                    print("\t" + letter + str(sL) + " : ", end="")
-                    val = ""
-                    try:
-                        val = shee.sheets[sheets_tab][letter + str(sL)]
-                    except Exception as e:
-                        print("",end="")
-                    if val != "" and val != " ":
-                        print(val)
-                        splitToday_low.append(val.replace("/", " / "))
-                    else:
-                        print()
-                splitL_low.append(splitToday_low)
+                if sheet_low_split_num_start != -1:
+                    print("Lower Split lunches: ")
+                    splitToday_low = []
+                    for sL in range(sheet_low_split_num_start, sheet_low_split_num_end+1):
+                        print("\t" + letter + str(sL) + " : ", end="")
+                        val = ""
+                        try:
+                            val = shee.sheets[sheets_tab][letter + str(sL)]
+                        except Exception as e:
+                            print("",end="")
+                        if val != "" and val != " ":
+                            print(val)
+                            splitToday_low.append(val.replace("/", " / "))
+                        else:
+                            print()
+                    splitL_low.append(splitToday_low)
+                else:
+                    print("Lower Split Lunches disabled (sheet_low_split_num_start == -1)")
             u_s = True
         except Exception as e:
             print("Sheets could not be loaded, please confirm that the url is correct and you have the rights to use it. \nError: "+ str(e))
             u_s = False
-#            raise(e)
+            print(f"Error: {e}")
+            raise(e)
     print("Sheets data updated.")
     return u_s
 last_u_s = False
