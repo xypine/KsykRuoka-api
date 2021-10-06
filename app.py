@@ -142,7 +142,7 @@ def updateSheets():
                     print("\t" + letter + str(sL) + " : ", end="")
                     val = ""
                     try:
-                        val = shee.sheets[sheets_tab][letter + str(sL)]
+                        val = shee.sheets[sheets_tab][letter + str(sL)] + "()"
                     except Exception as e:
                         print("",end="")
                     if val != "" and val != " ":
@@ -155,7 +155,7 @@ def updateSheets():
                     print("\t" + letter + str(nL) + " : ", end="")
                     val = ""
                     try:
-                        val = shee.sheets[sheets_tab][letter + str(nL)]
+                        val = shee.sheets[sheets_tab][letter + str(nL)] + "()"
                     except Exception as e:
                         print("",end="")
                     if val != "" and val != " ":
@@ -172,7 +172,7 @@ def updateSheets():
                         print("\t" + letter + str(sL) + " : ", end="")
                         val = ""
                         try:
-                            val = shee.sheets[sheets_tab][letter + str(sL)]
+                            val = shee.sheets[sheets_tab][letter + str(sL)] + "()"
                         except Exception as e:
                             print("",end="")
                         if val != "" and val != " ":
