@@ -188,7 +188,7 @@ def updateSheets():
             print("Sheets could not be loaded, please confirm that the url is correct and you have the rights to use it. \nError: "+ str(e))
             u_s = False
             print(f"Error: {e}")
-            raise(e)
+            #raise(e)
     print("Sheets data updated.")
     return u_s
 last_u_s = False
